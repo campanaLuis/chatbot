@@ -67,8 +67,8 @@ app.post("/send-proactive", express.json(), async (req, res) => {
   }
 });
 
-app.post("/status", (req, res) => {
-  res.send("Ok");
+app.get("/health", (req, res) => {
+  res.json({ ok: true, uptime: process.uptime() });
 });
 
 app.listen(process.env.PORT || port, () => {
