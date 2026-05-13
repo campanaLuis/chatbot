@@ -370,7 +370,7 @@ class NuevaPersonaActions {
     let message = "*Aqui está la información de tu red*:\n";
     message += `Referidos directos: ${infoDeRed?.direct_descendants}\n`;
     message += `Referidos totales: ${infoDeRed?.all_descendants}\n`;
-    message += `¡Puedes ver tu red completa aquí! https://redafinidad.seguimientoamigos.com/red/${persona.hash_code}\n\n`;
+    message += `¡Puedes ver tu red completa aquí! https://redafinidad-seguimientoamigos.whoopflow.com/red/${persona.hash_code}\n\n`;
     return message;
   }
 
