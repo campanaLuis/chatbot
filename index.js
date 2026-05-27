@@ -5,6 +5,7 @@ const { MessagingResponse } = require("twilio").twiml;
 const Conversator = require("./Conversator");
 const twilio = require("twilio");
 const axios = require("axios");
+const { syncConversation } = require("./AgoraConversationSync");
 
 const app = express();
 const port = 3000;
@@ -26,6 +27,9 @@ app.post("/whatsapp", async (req, res) => {
   await conversator.respondTo(userMessage);
 
   const phone = user.slice(-10);
+  const twimlStr = twiml.toString();
+
+  syncConversation(phone, userMessage.Body, twimlStr).catch(() => {});
 
   await axios.post(
     process.env.API_URL + "/chatbot/registro-de-ultimo-mensaje",
@@ -41,7 +45,7 @@ app.post("/whatsapp", async (req, res) => {
     },
   );
 
-  res.type("text/xml").send(twiml.toString());
+  res.type("text/xml").send(twimlStr);
 });
 
 app.post("/send-proactive", express.json(), async (req, res) => {
