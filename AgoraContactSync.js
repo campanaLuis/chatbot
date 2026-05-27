@@ -19,18 +19,21 @@ const AGORA_ACCOUNT = process.env.AGORA_ACCOUNT_ID || "1";
 
 // Map chatbot field names → AGORA custom_attribute keys
 const FIELD_MAP = {
-  codigopostal:              "codigopostal",
-  colonia:                   "colonia",
-  twitter_handle:            "twitter",
-  instagram_handle:          "instagram",
-  facebook_handle:           "facebook",
-  tiktok_handle:             "tiktok",
-  intereses_text:            "intereses",
-  intereses_voice_note_url:  "intereses_voice_note_url",
-  sexo:                      "sexo",
-  fechadenacimiento:         "fecha_de_nacimiento",
-  profesion:                 "profesion",
-  origen:                    "origen",
+  codigopostal:                      "codigopostal",
+  colonia:                           "colonia",
+  twitter_handle:                    "twitter",
+  instagram_handle:                  "instagram",
+  facebook_handle:                   "facebook",
+  tiktok_handle:                     "tiktok",
+  intereses_text:                    "intereses",
+  intereses_voice_note_url:          "intereses_voice_note_url",
+  sexo:                              "sexo",
+  fechadenacimiento:                 "fecha_de_nacimiento",
+  profesion:                         "profesion",
+  origen:                            "origen",
+  tipodeparticipacionpreferida:      "tipo_participacion",
+  refiereid:                         "refiere_id",
+  fecha_registro:                    "fecha_registro",
 };
 
 // Fields that map to top-level AGORA contact fields (not custom_attributes)
