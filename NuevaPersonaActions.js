@@ -1,6 +1,7 @@
 const axios = require("axios");
 const { getColoniasByCP } = require("./sepomexIndex");
 const NuevoReporteActions = require("./NuevoReporteActions");
+const { syncCrearPersona, syncModificarPersona } = require("./AgoraContactSync");
 const client = require("twilio")(
   process.env.TWILIO_ACCOUNT_SID,
   process.env.TWILIO_AUTH_TOKEN,
@@ -92,6 +93,7 @@ async function modificarPersona(user, field, value) {
         },
       },
     );
+    syncModificarPersona(phone, field, value).catch(() => {});
     return result.data;
   } catch (error) {
     console.error("Error al modificar persona:", error);
@@ -633,6 +635,7 @@ Escribe cancelar o salir para regresar al menú principal.
     } catch (error) {
       console.error("Error al crear usuario:", error);
     }
+    syncCrearPersona(phone, userInput.Body).catch(() => {});
     return true;
   }
 
