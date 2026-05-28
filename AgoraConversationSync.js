@@ -98,13 +98,16 @@ async function createConversation(contactId) {
  */
 async function addMessage(conversationId, content, messageType = "incoming") {
   if (!content || !content.trim()) return;
+  // AGORA only allows message_type "incoming" on API inboxes.
+  // For Twilio inboxes, send user messages as private notes so agents can see them.
+  const isIncoming = messageType === "incoming";
   try {
     await axios.post(
       `${AGORA_URL}/api/v1/accounts/${AGORA_ACCOUNT}/conversations/${conversationId}/messages`,
       {
-        content:      content.trim(),
-        message_type: messageType,
-        private:      false,
+        content:      isIncoming ? `👤 ${content.trim()}` : content.trim(),
+        message_type: "outgoing",
+        private:      isIncoming,
       },
       { headers: headers() }
     );
