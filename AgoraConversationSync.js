@@ -131,11 +131,20 @@ function extractTwimlMessages(twimlStr) {
  * @param {string} twimlStr    - TwiML XML string with bot response(s)
  */
 async function syncConversation(phone10, userMessage, twimlStr) {
-  if (!AGORA_URL || !AGORA_TOKEN || !AGORA_INBOX) return;
+  if (!AGORA_URL || !AGORA_TOKEN || !AGORA_INBOX) {
+    console.log("[AgoraConvSync] Missing env vars, skipping");
+    return;
+  }
 
   try {
+    console.log(`[AgoraConvSync] Syncing phone=${phone10} msg="${userMessage?.slice(0,30)}"`);
+
     const contact = await findContact(phone10);
-    if (!contact) return;
+    if (!contact) {
+      console.log(`[AgoraConvSync] Contact not found for ${phone10}, skipping`);
+      return;
+    }
+    console.log(`[AgoraConvSync] Contact found id=${contact.id}`);
 
     let conversation = await findOpenConversation(contact.id);
     if (!conversation) {
@@ -144,15 +153,18 @@ async function syncConversation(phone10, userMessage, twimlStr) {
     if (!conversation) return;
 
     const convId = conversation.id;
+    console.log(`[AgoraConvSync] Using conversation id=${convId}`);
 
     // Add user message as private note (Twilio inbox restricts incoming via API)
     await addMessage(convId, userMessage, "incoming");
 
     // Add bot response(s)
     const botMessages = extractTwimlMessages(twimlStr);
+    console.log(`[AgoraConvSync] Bot messages extracted: ${botMessages.length}`);
     for (const msg of botMessages) {
       await addMessage(convId, msg, "outgoing");
     }
+    console.log(`[AgoraConvSync] Done`);
   } catch (err) {
     console.error("[AgoraConvSync] syncConversation error:", err.message);
   }
