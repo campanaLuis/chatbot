@@ -26,10 +26,14 @@ function headers() {
 }
 
 function formatPhone(phone10digits) {
-  const digits = String(phone10digits).replace(/\D/g, "");
-  if (digits.length === 10) return `+52${digits}`;
-  if (digits.length === 12 && digits.startsWith("52")) return `+${digits}`;
-  return `+52${digits.slice(-10)}`;
+  // Accept E.164 directly (e.g. +5217711202916)
+  const s = String(phone10digits).trim();
+  if (s.startsWith("+")) return s;
+  const digits = s.replace(/\D/g, "");
+  if (digits.length === 10) return `+521${digits}`;          // Mexican 10-digit → +521XXXXXXXXXX
+  if (digits.length === 13 && digits.startsWith("521")) return `+${digits}`;
+  if (digits.length === 12 && digits.startsWith("52")) return `+52${digits.slice(2)}`; // missing 1
+  return `+521${digits.slice(-10)}`;
 }
 
 /**
