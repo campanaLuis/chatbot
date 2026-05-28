@@ -29,14 +29,6 @@ app.post("/whatsapp", async (req, res) => {
   const phone = user.slice(-10);
   const twimlStr = twiml.toString();
 
-  // Forward raw Twilio payload to AGORA so it handles incoming msg natively
-  if (process.env.AGORA_API_URL && process.env.AGORA_INBOX_ID) {
-    axios.post(
-      `${process.env.AGORA_API_URL}/twilio/callback`,
-      new URLSearchParams(req.body).toString(),
-      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
-    ).catch(() => {});
-  }
 
   await axios.post(
     process.env.API_URL + "/chatbot/registro-de-ultimo-mensaje",
