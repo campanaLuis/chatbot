@@ -96,16 +96,15 @@ async function createConversation(contactId) {
  * Add a message to a conversation.
  * messageType: "incoming" (user) | "outgoing" (bot)
  */
-async function addMessage(conversationId, content, messageType = "outgoing") {
+async function addMessage(conversationId, content) {
   if (!content || !content.trim()) return;
-  const isIncoming = messageType === "incoming";
   try {
     await axios.post(
       `${AGORA_URL}/api/v1/accounts/${AGORA_ACCOUNT}/conversations/${conversationId}/messages`,
       {
         content:      content.trim(),
         message_type: "outgoing",
-        private:      isIncoming, // user msgs as private note until API inbox
+        private:      true, // private note: AGORA records it without re-sending via Twilio
       },
       { headers: headers() }
     );
@@ -155,14 +154,12 @@ async function syncConversation(phone10, userMessage, twimlStr) {
     const convId = conversation.id;
     console.log(`[AgoraConvSync] Using conversation id=${convId}`);
 
-    // Add user message as private note (Twilio inbox restricts incoming via API)
-    await addMessage(convId, userMessage, "incoming");
-
-    // Add bot response(s)
+    // Incoming user message arrives in AGORA natively via Twilio webhook — skip it here.
+    // Only sync the bot's outgoing responses as private notes (avoids AGORA re-sending via Twilio).
     const botMessages = extractTwimlMessages(twimlStr);
     console.log(`[AgoraConvSync] Bot messages extracted: ${botMessages.length}`);
     for (const msg of botMessages) {
-      await addMessage(convId, msg, "outgoing");
+      await addMessage(convId, msg);
     }
     console.log(`[AgoraConvSync] Done`);
   } catch (err) {
