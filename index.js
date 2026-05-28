@@ -29,6 +29,17 @@ app.post("/whatsapp", async (req, res) => {
   const phone = user.slice(-10);
   const twimlStr = twiml.toString();
 
+  // Forward raw Twilio payload to AGORA so incoming message is created natively
+  if (process.env.AGORA_API_URL) {
+    axios.post(
+      `${process.env.AGORA_API_URL}/twilio/callback`,
+      new URLSearchParams(req.body).toString(),
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+    ).catch(() => {});
+  }
+
+  // Sync bot responses as private notes (after delay so conversation exists)
+  setTimeout(() => syncConversation(phone, userMessage.Body, twimlStr).catch(() => {}), 3000);
 
   await axios.post(
     process.env.API_URL + "/chatbot/registro-de-ultimo-mensaje",
