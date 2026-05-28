@@ -96,18 +96,15 @@ async function createConversation(contactId) {
  * Add a message to a conversation.
  * messageType: "incoming" (user) | "outgoing" (bot)
  */
-async function addMessage(conversationId, content, messageType = "incoming") {
+async function addMessage(conversationId, content, messageType = "outgoing") {
   if (!content || !content.trim()) return;
-  // AGORA only allows message_type "incoming" on API inboxes.
-  // For Twilio inboxes, send user messages as private notes so agents can see them.
-  const isIncoming = messageType === "incoming";
   try {
     await axios.post(
       `${AGORA_URL}/api/v1/accounts/${AGORA_ACCOUNT}/conversations/${conversationId}/messages`,
       {
-        content:      isIncoming ? `👤 ${content.trim()}` : content.trim(),
-        message_type: "outgoing",
-        private:      isIncoming,
+        content:      content.trim(),
+        message_type: messageType,
+        private:      false,
       },
       { headers: headers() }
     );
@@ -147,10 +144,8 @@ async function syncConversation(phone10, userMessage, twimlStr) {
 
     const convId = conversation.id;
 
-    // Add user message
-    await addMessage(convId, userMessage, "incoming");
-
-    // Add bot response(s)
+    // NOTE: incoming user message is handled natively by AGORA via /twilio/callback
+    // Here we only add the bot's outgoing response(s)
     const botMessages = extractTwimlMessages(twimlStr);
     for (const msg of botMessages) {
       await addMessage(convId, msg, "outgoing");
